@@ -1,7 +1,10 @@
+[CLAUDE.md](https://github.com/user-attachments/files/31332526/CLAUDE.md)
 # CLAUDE.md
 
 このリポジトリは `node-library`(ノードの実体を集約する専用リポジトリ)。
 設計方針・ロードマップは `ROADMAP.md` を参照すること。
+
+**このプロジェクトの対象範囲は決済・認証に限らない。** サイト・アプリのコーディング全体(エラーハンドリング規約、ロギング設定、APIレスポンス形式、ルーティング規約なども含む)を、なるべく多くの範囲でノード化することが目的。決済・認証はセキュリティ要求が最も厳しく安全機構の検証に適しているため最初の実装例として選んだだけで、設計そのものを決済・認証専用に寄せないこと。
 
 ## 最重要ルール
 
@@ -23,6 +26,7 @@ Phase 0 で作るもの:
 - `schema.yaml`フォーマット(`node_type` / `forkable` / `category` / `config` / `entry`。`inputs`/`outputs`/`ui`/`adapter_interface`は含めない — ROADMAP.md 2.1参照)
 - `.claude/skills/add-node/`(参照型ノードの作成に対応)
 - 参照型・security-sensitiveなノードを2つ(決済Webhook処理、認証ロジック)
+- **決済・認証以外の参照型ノード(例: 共通エラーハンドリング/ロギング規約)のschema.yamlを下書きだけ書いてみる(実装しない)。スキーマが決済・認証の形に引きずられていないかの確認**
 - submodule参照・一括反映の検証
 
 Phase 0 の完了条件を満たすまで、以下には手を出さないこと:
