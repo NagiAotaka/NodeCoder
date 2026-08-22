@@ -1,0 +1,22 @@
+# これはPhase 0の「スキーマ汎用性の下書き検証」用のschema.yamlであり、
+# 実装(entry.ts等)は作らない(ROADMAP.md 3章 Phase 0参照)。
+# 目的: schema.yamlフォーマットが決済・認証の形に引きずられていないかを、
+# 決済・認証以外の参照型ノードで確認すること。
+
+id: error-handling-convention
+node_type: reference
+
+# security-sensitive-categories.yaml に未記載のカテゴリ。
+# 2.7の原則により、未記載の新規カテゴリはデフォルトでsecurity-sensitive扱いと
+# なるため、forkableは自動的にfalse固定される。この挙動は決済・認証専用の
+# ロジックではなく、category名に関わらず一貫して機能することをここで確認した。
+category: error-handling
+
+forkable: false
+
+entry: ./index.ts
+
+# --- 検証結果メモ ---
+# config / adapter_interface を一切使わずに
+# id / node_type / category / entry のみで schema.yaml が成立した。
+# → スキーマは決済・認証固有の形に依存していないことを確認。
