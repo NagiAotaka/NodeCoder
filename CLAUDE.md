@@ -1,10 +1,10 @@
-[CLAUDE.md](https://github.com/user-attachments/files/31332526/CLAUDE.md)
+[CLAUDE.md](https://github.com/user-attachments/files/31332815/CLAUDE.md)
 # CLAUDE.md
 
 このリポジトリは `node-library`(ノードの実体を集約する専用リポジトリ)。
 設計方針・ロードマップは `ROADMAP.md` を参照すること。
 
-**このプロジェクトの対象範囲は決済・認証に限らない。** サイト・アプリのコーディング全体(エラーハンドリング規約、ロギング設定、APIレスポンス形式、ルーティング規約なども含む)を、なるべく多くの範囲でノード化することが目的。決済・認証はセキュリティ要求が最も厳しく安全機構の検証に適しているため最初の実装例として選んだだけで、設計そのものを決済・認証専用に寄せないこと。
+サイト・アプリのコーディングを、なるべく広い範囲で疎結合な「ノード」として分散管理するのが目的(認証・決済・エラーハンドリング・ロギング・APIレスポンス形式など)。
 
 ## 最重要ルール
 
@@ -25,8 +25,7 @@
 Phase 0 で作るもの:
 - `schema.yaml`フォーマット(`node_type` / `forkable` / `category` / `config` / `entry`。`inputs`/`outputs`/`ui`/`adapter_interface`は含めない — ROADMAP.md 2.1参照)
 - `.claude/skills/add-node/`(参照型ノードの作成に対応)
-- 参照型・security-sensitiveなノードを2つ(決済Webhook処理、認証ロジック)
-- **決済・認証以外の参照型ノード(例: 共通エラーハンドリング/ロギング規約)のschema.yamlを下書きだけ書いてみる(実装しない)。スキーマが決済・認証の形に引きずられていないかの確認**
+- 参照型ノードを3つ(決済Webhook処理、認証ロジック、エラーハンドリング規約)
 - submodule参照・一括反映の検証
 
 Phase 0 の完了条件を満たすまで、以下には手を出さないこと:
@@ -51,8 +50,9 @@ Phase 0 の完了条件を満たすまで、以下には手を出さないこと
 1. `/add-node` Skill の `SKILL.md` を作成(node_type/forkableの質問を最優先項目として組み込む)
 2. 参照型ノード1つ目(決済Webhook処理、forkable: false)の`entry.ts`等を作成 → `verify.ts`(動的テストは手元の`.env`で実行)
 3. 参照型ノード2つ目(認証ロジック、forkable: false)を作成 → 同様に検証
-4. 実プロジェクト(content repo)からこのリポジトリをsubmodule参照させ、動くことを確認
-5. ノードを1つ更新し、`update-nodes.sh`(失敗時は該当repoのみロールバック)でcontent repo側に反映されることを確認
-6. 配線スパイク(型・エラー伝播・非同期順序の見通しを立てる)
+4. 参照型ノード3つ目(エラーハンドリング規約)を作成 → 同様に検証
+5. 実プロジェクト(content repo)からこのリポジトリをsubmodule参照させ、動くことを確認
+6. ノードを1つ更新し、`update-nodes.sh`(失敗時は該当repoのみロールバック)でcontent repo側に反映されることを確認
+7. 配線スパイク(型・エラー伝播・非同期順序の見通しを立てる)
 
 Phase 0 完了時には、ROADMAP.md の完了条件を確認する。CI・check-markers.sh・check-nodes-status.sh・generate.jsはPhase 1で着手する。
