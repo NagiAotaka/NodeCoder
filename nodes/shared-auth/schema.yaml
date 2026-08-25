@@ -1,0 +1,11 @@
+id: shared-auth
+node_type: reference
+category: auth              # security-sensitive-categories.yaml に記載 → forkable: false固定
+forkable: false
+
+config:
+  - name: tokenSecret        # セッショントークン(JWT)の署名鍵
+    type: secret
+    required_decision: true
+
+entry: ./index.ts

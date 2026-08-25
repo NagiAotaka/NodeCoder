@@ -1,0 +1,11 @@
+id: stripe-webhook
+node_type: reference
+category: payment          # security-sensitive-categories.yaml に記載 → forkable: false固定
+forkable: false
+
+config:
+  - name: webhookSecret     # Stripe Webhook署名検証用シークレット(Stripeダッシュボードで発行)
+    type: secret
+    required_decision: true
+
+entry: ./index.ts
