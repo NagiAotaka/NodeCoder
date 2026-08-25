@@ -1,7 +1,7 @@
-# これはPhase 0の「スキーマ汎用性の下書き検証」用のschema.yamlであり、
-# 実装(entry.ts等)は作らない(ROADMAP.md 3章 Phase 0参照)。
-# 目的: schema.yamlフォーマットが決済・認証の形に引きずられていないかを、
-# 決済・認証以外の参照型ノードで確認すること。
+# Phase 0で作成する参照型ノード3つのうち3つ目(CLAUDE.md「現在の作業範囲」/
+# ROADMAP.md 3章 Phase 0参照)。決済Webhook処理・認証ロジックと同格のノードで、
+# entry.ts/verify.tsの実装は進め方(CLAUDE.md)ステップ4で行う(このschema.yaml
+# 時点ではまだ未実装)。
 
 id: error-handling-convention
 node_type: reference
@@ -16,7 +16,8 @@ forkable: false
 
 entry: ./index.ts
 
-# --- 検証結果メモ ---
+# --- メモ ---
 # config / adapter_interface を一切使わずに
 # id / node_type / category / entry のみで schema.yaml が成立した。
-# → スキーマは決済・認証固有の形に依存していないことを確認。
+# → config/adapter_interfaceはサービス連携系ノードのみのオプション項目であり、
+#   このようなサービス連携の無いノードには不要であることを確認(2.1参照)。
