@@ -1,14 +1,14 @@
 ---
 name: add-node
-description: node-library に新しいノードを追加する(schema.yaml の意思決定 + 参照型ノードの実体作成)。Phase 0時点では reference型のみ対応。
+description: node-library に新しいノードを追加する(schema.yaml の意思決定 + 参照型ノードの実体作成、または生成型ノードの生成)。
 ---
 
 # /add-node
 
-> **Phase 0スコープの注意**: このSkillが対応するのは Phase 0 の範囲のみ。
-> `tools/generate.js`・CI・`check-markers.sh`・`check-nodes-status.sh` は
-> まだ存在しない(Phase 1で導入予定)。scaffold型のノード追加は本Skillでは
-> まだサポートしない。
+> **Phase 1時点のスコープ**: `tools/generate.js` は実装済みのため、
+> 生成型(scaffold)ノードの生成もこのSkillで対応する。
+> `check-markers.sh`・`check-nodes-status.sh`・CI(`.github/workflows/check.yml`)
+> はまだ存在しない(Phase 1で別途導入予定)。
 
 ## 最重要ルール(CLAUDE.md)
 
@@ -32,11 +32,8 @@ description: node-library に新しいノードを追加する(schema.yaml の�
 対象範囲は認証・決済に限らない。エラーハンドリング規約・ロギング設定・
 APIレスポンス形式なども同列にノード化の対象となる(CLAUDE.md/ROADMAP.md 0章)。
 
-- **`scaffold` が選ばれた場合**: `tools/generate.js`(決定論的テンプレート
-  エンジン)がまだ存在しない(Phase 1で導入予定)ため、その場で作業を
-  中断し、ユーザーにその旨を伝える。テンプレートを手で穴埋めするなど、
-  generate.js の代わりを自分で行ってはならない。
-- **`reference` が選ばれた場合**: 以下のステップに進む。
+- **`scaffold` が選ばれた場合**: 「手順(scaffold型)」セクションに進む。
+- **`reference` が選ばれた場合**: 以下のステップ2〜8に進む。
 
 ### 2. 既存の類似ノード・テンプレートを確認する
 
@@ -128,3 +125,34 @@ APIレスポンス形式なども同列にノード化の対象となる(CLAUDE.
   これはcontent repo向けの`.env.example`(configのキー)とは別物 —
   node-library内で`verify.ts`を直接実行する開発者向けのファイル。
   こちらも実値は`.env`(`.gitignore`対象)にのみ置く。
+
+## 手順(scaffold型)
+
+生成型ノードは、content repo内で既存の生成型ノード定義(`node-library`側の
+`nodes/<id>/schema.yaml` + `template`)を使って`tools/generate.js`にコードを
+生成させる。**LLMはここでコードを一切書かない** — これが最重要ルールの核心。
+
+1. どの生成型ノードを使うか確認する(例: `page-layout-basic`)。存在しない
+   場合は、まず`node-library`側でそのノードの`schema.yaml`と`template`を
+   用意する必要がある(これは生成型ノードの「新規追加」であり、reference型
+   の手順2〜4と同様にLLMが`schema.yaml`とテンプレートを書く)。
+2. 対象ノードの`schema.yaml`にある`config`の`required_decision: true`項目
+   (例: `title`、`slug`)をユーザーに質問する。
+3. 回答を`key: value`形式の一時ファイル(answers.yaml)にまとめる。
+4. 出力先パス(content repo内、例: `src/layout/<slug>.ts`)をユーザーに確認する。
+5. 次のコマンドを実行する(`<vendor>`はcontent repo内でnode-libraryを
+   submodule参照しているパス、通常`vendor/node-library`):
+   ```
+   node <vendor>/tools/generate.js --node <id> --answers <answers.yaml> --out <output-path>
+   ```
+6. 出力ファイル先頭には`GENERATED - DO NOT EDIT`マーカーが自動的に付く。
+   以後ユーザーがそのファイルを手で編集し`CUSTOMIZED - manual changes below`
+   マーカーを追記すれば、`/add-node`を再実行しても**上書きされない**
+   (`generate.js`が検知して中断する)。GENERATEDマーカーのみのファイルは
+   `schema.yaml`の入力が変わった場合に自動上書きしてよい。
+7. 一時ファイル(answers.yaml)は生成後に削除してよい(schema.yamlの入力
+   さえ分かれば同じ出力を再現できるため、恒久的に保持する必要はない)。
+8. 生成型ノードには`forkable`の概念が無い(生成された時点でcontent repo側
+   の独立したコードになるため)。security-sensitiveの重い確認手順
+   (手順7参照)も、forkable判定や外部API呼び出しを前提にしたものであり、
+   静的なテンプレートのみの生成型ノードには基本的に適用しない。
