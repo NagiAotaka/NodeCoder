@@ -1,0 +1,5 @@
+# シークレットの実値は一切コミットしない(CLAUDE.md「絶対に守ること」/ ROADMAP.md 2.4)
+# security-sensitiveなノードのverify.ts動的テストを手元で実行する際に使う .env のみが対象。
+.env
+.env.local
+.env.*.local

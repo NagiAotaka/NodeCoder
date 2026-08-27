@@ -116,8 +116,15 @@ APIレスポンス形式なども同列にノード化の対象となる(CLAUDE.
    (実キーをCI環境に持ち込むことになるため)。
 3. ユーザーの確認が取れてから初めてコミットする。
 
-### 8. シークレット管理
+### 8. シークレット管理(ROADMAP.md 2.4)
 
 - 実値(APIキー等)は一切扱わない。`schema.yaml` にもコードにも書かない。
 - `type: secret` の `config` 項目は、キー名だけを対象content repoの
-  `.env.example` に追記する。実値の入力はユーザーに促す。
+  `.env.example` に追記する(`install.sh`が自動生成する分がこれに該当)。
+  実値の入力はユーザーに促す。
+- ノード自身の `verify.ts` が動的テストで外部APIを叩く必要があり、その
+  ために追加のシークレット(例: `STRIPE_TEST_SECRET_KEY`)が要る場合は、
+  それを **node-library自身のルート `.env.example`** にキー名だけ追記する。
+  これはcontent repo向けの`.env.example`(configのキー)とは別物 —
+  node-library内で`verify.ts`を直接実行する開発者向けのファイル。
+  こちらも実値は`.env`(`.gitignore`対象)にのみ置く。
