@@ -156,3 +156,26 @@ APIレスポンス形式なども同列にノード化の対象となる(CLAUDE.
    の独立したコードになるため)。security-sensitiveの重い確認手順
    (手順7参照)も、forkable判定や外部API呼び出しを前提にしたものであり、
    静的なテンプレートのみの生成型ノードには基本的に適用しない。
+
+## フォーク手順(`forkable: true`の参照型ノードのみ)
+
+フォークとは、特定の参照型ノードだけをcontent repo内に独立させ、以後
+node-library側の更新を自動で受け取らないようにすることである
+(ROADMAP.md 2.5)。**`forkable: true`のノードのみ**対象。`/add-node`の
+一部ではなく、content repo内でのファイルレベルの作業であり、`/add-node`
+Skillでも代行しない。
+
+1. 対象ノードが`forkable: true`であることを`schema.yaml`で確認する
+   (`false`のノードは絶対にフォークしない — 運用ルールと検知スクリプトで
+   担保される禁止事項)。
+2. `vendor/node-library/nodes/<id>/`フォルダを、content repo内(例:
+   `src/nodes/<id>/`)にそのままコピーする。
+3. import元をsubmodule経由(`./vendor/node-library/nodes/<id>/...`)から
+   コピー先のlocal path(`./src/nodes/<id>/...`)に切り替える。
+4. `vendor/node-library`のsubmodule自体は削除しない(他のノードのために
+   引き続き参照する)。
+5. フォーク後は、そのノードだけ`node-library`側の更新が自動反映されなく
+   なる(意図的な仕様。`update-nodes.sh`による一括反映の対象からも外れる)。
+   `forkable: true`のノードへの更新時は、node-library側が`# SECURITY-FIX:
+   <日付> <一言>`をファイル先頭に追記する運用を残すが、確認は一括反映時
+   ではなくCIと`check-markers.sh`実行時に行う(Phase 1で導入予定)。

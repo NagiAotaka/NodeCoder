@@ -6,12 +6,25 @@ id: error-handling-convention
 node_type: reference
 
 # security-sensitive-categories.yaml に未記載のカテゴリ。
-# 2.7の原則により、未記載の新規カテゴリはデフォルトでsecurity-sensitive扱いと
-# なるため、forkableは自動的にfalse固定される。この挙動は決済・認証専用の
-# ロジックではなく、category名に関わらず一貫して機能することをここで確認した。
+# 2.7の原則により、未記載の新規カテゴリは/add-node実行時にはデフォルトで
+# security-sensitive扱いとなり、forkableは自動的にfalse固定される
+# (この自動判定の挙動自体は、category名に関わらず一貫して機能することを
+# Phase 0時点で確認済み)。
+#
+# Phase 1: このノードについては人間がレビューした上で、"error-handling"という
+# category自体は本質的にsecurity-sensitiveではない(外部秘密鍵・認証・決済を
+# 一切扱わない静的なエラー正規化ロジックのみ)と判断し、forkable: true へ
+# 変更する。ROADMAP.md Phase 1がforkable検証の候補としてこのノードを
+# 名指ししていることとも整合する。これは「security-sensitiveなノードの
+# forkableを変える」のではなく「デフォルトの安全側判定を、個別ノードについて
+# 人間が明示的にレビューして上書きする」操作であり、CLAUDE.mdの
+# 「security-sensitiveな参照型ノードはforkable: false固定・変更不可」という
+# 制約とは矛盾しない(そもそもsecurity-sensitiveではないと判断したため)。
+# security-sensitive-categories.yaml(payment/auth/secretsの一元管理)自体は
+# 変更しない。
 category: error-handling
 
-forkable: false
+forkable: true
 
 entry: ./index.ts
 
