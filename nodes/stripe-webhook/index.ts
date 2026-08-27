@@ -9,7 +9,15 @@ export interface VerifySignatureOptions {
   now?: () => number;
 }
 
-export class StripeSignatureError extends Error {}
+// ノード横断のエラー契約(Phase 1、配線スパイクで見つかった課題への対応):
+// ノード同士は互いをimportしないが、`code`(string)と`status`(number)を
+// 持つという緩やかな形状の規約には従う。error-handling-conventionの
+// normalizeErrorはこの形状をダックタイピングで検出し、AppError以外の
+// エラーでも本来のstatus/codeを保持したまま正規化する。
+export class StripeSignatureError extends Error {
+  readonly code = "STRIPE_SIGNATURE_INVALID";
+  readonly status = 400;
+}
 
 // category: payment のノードでは、冪等性キーの実装が伴わない限り
 // retryCountを1より大きくしてはならない(CLAUDE.md「絶対に守ること」)。

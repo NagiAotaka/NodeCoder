@@ -126,6 +126,23 @@ APIレスポンス形式なども同列にノード化の対象となる(CLAUDE.
   node-library内で`verify.ts`を直接実行する開発者向けのファイル。
   こちらも実値は`.env`(`.gitignore`対象)にのみ置く。
 
+### 9. `nodes/README.md`に1行追記する(発見可能性の担保)
+
+reference型・scaffold型いずれの場合も、ノードの新規追加・`node_type`や
+`forkable`の変更を行ったら、最後に`nodes/README.md`の一覧表に1行追記/更新
+する。自動生成はしない。`ls nodes/`だけでは各ノードの性質が分からなくなる
+ことへの、Phase 0評価で見つかった懸念点への軽量な対応(ROADMAP.md Phase 1)。
+
+### 10. ノード横断のエラー契約(該当するノードのみ)
+
+エラーを投げる可能性があるノード(participant nodeが例外を投げる設計の場合)
+を作る際は、そのエラークラスに`code`(string)と`status`(number)プロパティを
+持たせる。他ノードをimportする必要は無い — `error-handling-convention`の
+`normalizeError`はこの形状をダックタイピングで検出し、`AppError`でなくても
+本来のstatus/codeを保持したまま正規化する(Phase 1、配線スパイクで見つかった
+「ノード横断のエラー契約の欠如」への対応。`nodes/stripe-webhook/index.ts`の
+`StripeSignatureError`、`nodes/shared-auth/index.ts`の`AuthError`が実装例)。
+
 ## 手順(scaffold型)
 
 生成型ノードは、content repo内で既存の生成型ノード定義(`node-library`側の

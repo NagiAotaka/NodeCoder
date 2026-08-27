@@ -17,7 +17,15 @@ export interface SessionClaims {
   [key: string]: unknown;
 }
 
-export class AuthError extends Error {}
+// ノード横断のエラー契約(Phase 1、配線スパイクで見つかった課題への対応):
+// ノード同士は互いをimportしないが、`code`(string)と`status`(number)を
+// 持つという緩やかな形状の規約には従う。error-handling-conventionの
+// normalizeErrorはこの形状をダックタイピングで検出し、AppError以外の
+// エラーでも本来のstatus/codeを保持したまま正規化する。
+export class AuthError extends Error {
+  readonly code = "AUTH_INVALID";
+  readonly status = 401;
+}
 
 function base64UrlEncode(input: Buffer): string {
   return input.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
