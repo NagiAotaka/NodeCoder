@@ -20,22 +20,28 @@
 
 ## 現在の作業範囲
 
-**Phase 0 のみ。Phase 1 以降の項目には着手しない。**
+**Phase 0 は完了。Phase 1 に着手する。Phase 2 以降の項目には着手しない。**
 
-Phase 0 で作るもの:
-- `schema.yaml`フォーマット(`node_type` / `forkable` / `category` / `config` / `entry`。`inputs`/`outputs`/`ui`/`adapter_interface`は含めない — ROADMAP.md 2.1参照)
+Phase 0 で作ったもの(完了済み):
+- `schema.yaml`フォーマット(`node_type` / `forkable` / `category` / `config` / `entry`)
 - `.claude/skills/add-node/`(参照型ノードの作成に対応)
 - 参照型ノードを3つ(決済Webhook処理、認証ロジック、エラーハンドリング規約)
-- submodule参照・一括反映の検証
+- submodule参照・一括反映の検証(`install.sh`・`update-nodes.sh`を含め実機で確認済み)
 
-Phase 0 の完了条件を満たすまで、以下には手を出さないこと:
-- `.github/workflows/check.yml`・`check-markers.sh`・`check-nodes-status.sh` → Phase 1。これらが検知する対象(マーカー違反、フォーク違反)はPhase 0にはまだ存在しないため
-- `tools/generate.js`(テンプレートエンジン)→ Phase 1。参照型ノードはテンプレート生成を使わないため、Phase 0では不要
+Phase 1 で作るもの(ROADMAP.md 3章 Phase 1参照):
+- シークレット管理方針(2.4)の実装
+- `tools/generate.js`(決定論的テンプレートエンジン)
+- 生成型ノードを最低1つ作成し、GENERATED/CUSTOMIZEDマーカーの運用を検証
+- `forkable: true`なノードを1つ作成しフォークを検証(エラーハンドリング規約ノードが候補)
+- 軽量CI・検知スクリプト(`.github/workflows/check.yml`、`tools/check-markers.sh`、`tools/check-nodes-status.sh`)
+- **Phase 0評価で見つかった懸念点への対応**(ROADMAP.md Phase 1参照): ノード横断のエラー契約の欠如、ブランチ固定の脆さ、アクセス権限の分散管理、発見可能性の欠如
+
+Phase 1 の完了条件を満たすまで、以下には手を出さないこと:
 - ビジュアルエディタ・配線実行エンジン → Phase 3
 - サーキットブレーカー等の耐障害機構 → Phase 4
 - 一括反映の自動化(cron等)→ 想定していない(常に手動トリガー)
 - npm package化・workspace化 → 検討済みで不採用(ROADMAP.md 2.10参照)
-- 生成型ノードの本格追加 → Phase 1
+- 3つ以上のcontent repoでの本格運用・定着 → Phase 2
 
 ## 絶対に守ること
 
@@ -45,14 +51,13 @@ Phase 0 の完了条件を満たすまで、以下には手を出さないこと
 - `category: payment` のノードでは、冪等性キーの実装が伴わない限り `retryCount` を 1 より大きくしない。
 - 軽量CI(Phase 1で導入)は非ブロッキングのチェック専用。必須レビュアーやブランチ保護は設定しない。
 
-## 進め方
+## 進め方(Phase 1)
 
-1. `/add-node` Skill の `SKILL.md` を作成(node_type/forkableの質問を最優先項目として組み込む)
-2. 参照型ノード1つ目(決済Webhook処理、forkable: false)の`entry.ts`等を作成 → `verify.ts`(動的テストは手元の`.env`で実行)
-3. 参照型ノード2つ目(認証ロジック、forkable: false)を作成 → 同様に検証
-4. 参照型ノード3つ目(エラーハンドリング規約)を作成 → 同様に検証
-5. 実プロジェクト(content repo)からこのリポジトリをsubmodule参照させ、動くことを確認
-6. ノードを1つ更新し、`update-nodes.sh`(失敗時は該当repoのみロールバック)でcontent repo側に反映されることを確認
-7. 配線スパイク(型・エラー伝播・非同期順序の見通しを立てる)
+1. シークレット管理方針(2.4)を実装する
+2. `tools/generate.js`(決定論的テンプレートエンジン)を作成する
+3. 生成型ノードを最低1つ作成し、`/add-node`経由で生成 → GENERATED/CUSTOMIZEDマーカーの運用を検証する
+4. `forkable: true`なノードを1つ作成し、フォーク(ファイルコピー+import元切り替え)を検証する
+5. 軽量CI・検知スクリプト(`.github/workflows/check.yml`、`tools/check-markers.sh`、`tools/check-nodes-status.sh`)を導入する
+6. Phase 0評価で見つかった懸念点(ノード横断のエラー契約・ブランチ固定・アクセス権限・発見可能性)への対応方針を検討する
 
-Phase 0 完了時には、ROADMAP.md の完了条件を確認する。CI・check-markers.sh・check-nodes-status.sh・generate.jsはPhase 1で着手する。
+Phase 1 完了時には、ROADMAP.md の完了条件(参照型/生成型の取り違え・フォーク禁止ルールの意図しない回避が0件)を確認する。Phase 2以降(運用の定着)には着手しない。
