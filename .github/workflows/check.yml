@@ -1,0 +1,18 @@
+# 非ブロッキングの軽量CI(ROADMAP.md 2.11)。
+# ロジックはすべて tools/ 配下のスクリプト・各ノードの verify.ts に置き、
+# ここはそれを呼ぶだけの薄い層にする。
+# 必須レビュアーやブランチ保護とは組み合わせない(CLAUDE.md「絶対に守ること」)。
+name: check
+on: [push]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./tools/check-markers.sh
+      - name: verify-all
+        run: |
+          for f in nodes/*/verify.ts; do
+            echo "== $f =="
+            node --experimental-strip-types "$f"
+          done

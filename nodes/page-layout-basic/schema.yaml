@@ -1,0 +1,31 @@
+# Phase 1の最初の生成型(scaffold)ノード。
+# 生成型ノードには forkable/entry は付与しない — フォークという概念は
+# 参照型ノードのみに意味があり、生成型は生成された時点でcontent repo側の
+# 独立したコードになるため(ROADMAP.md 2.5)。
+#
+# category: layout はsecurity-sensitive-categories.yamlに未記載だが、
+# 2.7のsecurity-sensitive手続き(コミット前diff確認・動的テスト)は
+# forkable判定・外部API呼び出しが存在する参照型ノードを主眼にしたもので、
+# forkableフィールド自体を持たない生成型ノードには適用しない。
+#
+# template.ts.hbs について: 拡張子は .hbs だが実際の構文はHandlebarsでは
+# ない。tools/generate.js が実装する二重中括弧プレースホルダの単純置換の
+# みをサポートする(依存パッケージを増やさないため)。このschema.yamlの
+# コメントはgenerate.jsの出力に含まれないが、template.ts.hbs自体は
+# 生成結果にそのまま出力されるため、template側にはこの手の説明コメントを
+# 書かないこと(生成先のcontent repoに意味不明なコメントが混入するため)。
+
+id: page-layout-basic
+node_type: scaffold
+category: layout
+
+config:
+  - name: title
+    type: plain
+    required_decision: true
+  - name: slug
+    type: plain
+    required_decision: true
+
+template: ./template.ts.hbs
+template_generation: 1

@@ -1,0 +1,10 @@
+# security-sensitive な category を一元管理する。
+# ROADMAP.md 2.7 の原則: ここに未記載の新規 category は
+# デフォルトで security-sensitive 扱いとする(安全側に倒す)。
+#
+# security-sensitive な参照型ノードは CLAUDE.md の最重要ルールにより
+# forkable: false で固定され、変更できない。
+security_sensitive_categories:
+  - payment
+  - auth
+  - secrets

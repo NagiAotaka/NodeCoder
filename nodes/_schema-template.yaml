@@ -1,0 +1,45 @@
+# schema.yaml フォーマット定義(Phase 0)
+#
+# これは実際のノードではなく、/add-node Skill と参照型ノード作成時の
+# 型となるサンプル・テンプレートである。
+#
+# 意図的に含めていないフィールド(ROADMAP.md 2.1):
+#   - inputs / outputs      → 配線エンジンの型照合。Phase 3の配線スパイクで
+#                             必要な型情報の形が判明してから追加する。
+#   - ui: icon / color      → ビジュアルエディタでの表示。Phase 3でビジュアル
+#                             エディタに着手すると決まった時に追加する。
+#   - adapter_interface     → 複数プロバイダの差し替え。2つ目のプロバイダを
+#                             実装する時に追加する(2.8)。
+#   - template / template_generation
+#                           → scaffold型のみ。generate.js を作る Phase 1で
+#                             scaffold型ノードを初めて作る際に追加する。
+# 使われないフィールドを先回りして足すと形骸化するため、Phase 0では
+# 上記を一切含めない。
+
+id: <node-id>                  # 例: stripe-webhook, error-handling-convention, api-response-format
+
+node_type: reference           # reference | scaffold
+                                # Phase 0の /add-node は reference のみ対応。
+                                # scaffold は generate.js が存在しないため未対応。
+
+category: <string>             # 決済・認証に限らない。例: payment / auth / secrets の他、
+                                # error-handling / logging / api-response のような
+                                # 外部サービスと無関係なカテゴリも同列に扱う。
+                                # security-sensitive-categories.yaml に載っていれば
+                                # (または未記載の新規categoryであれば)
+                                # security-sensitive 扱いとなり forkable は自動固定。
+
+forkable: false                # security-sensitiveな参照型ノードは常に false 固定・変更不可。
+                                # non-security-sensitiveな参照型ノードのみ true にできる
+                                # (forkable: true の運用はPhase 1で検証)。
+
+# --- 以下 config はサービス連携系ノードのみが使うオプション項目。 ---
+# エラーハンドリング規約・ロギング設定・APIレスポンス形式のように外部サービスとの
+# 連携が無いノードでは config を持たず、id/node_type/category/entry だけで
+# schema.yaml が成立する(例: nodes/error-handling-convention/schema.yaml)。
+config:                        # 実値は書かない。
+  - name: <configName>         # 例: apiKey, webhookSecret(あくまで一例)
+    type: secret                # secret | plain
+    required_decision: true     # /add-node がユーザーに質問する項目
+
+entry: ./index.ts              # reference型のみ。importされる実体ファイルへのパス。
