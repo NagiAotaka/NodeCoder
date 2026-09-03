@@ -11,3 +11,4 @@
 | `shared-auth` | reference | auth | false | JWTセッショントークンの検証+失効チェック |
 | `error-handling-convention` | reference | error-handling | true | 統一エラーレスポンス形式(ノード横断のエラー契約の受け皿) |
 | `page-layout-basic` | scaffold | layout | (該当なし) | ページレイアウトの叩き台(`tools/generate.js`で生成) |
+| `random-rotation` | reference | randomization | false | 現在の回転角からランダムな次の累積回転角を1つ決める純粋関数 |

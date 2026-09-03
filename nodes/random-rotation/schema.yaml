@@ -1,0 +1,30 @@
+# 参照型(reference)ノード。「選択器」の分解時にarrow-spinner(生成型)を
+# 削除した反省(.claude/skills/add-node/SKILL.md「具体的な再利用性テスト」
+# のBad例そのもの)を受けて作り直した、より基礎的な汎用部品。
+#
+# 「矢印を回してランダムな角度で止める」というアプリ丸ごとの機能ではなく、
+# それを支える「現在の回転角から、指定した最小/最大回転数の範囲でランダムな
+# 最終回転角を1つ決める」という純粋な計算ロジックだけを切り出した。
+# SVG描画・CSS・DOM操作・ボタン文言などアプリ固有の見た目・組み合わせ方は
+# 一切含まない(それらはcontent repo側に残す)。
+#
+# 具体的な再利用性テスト(2プロジェクト以上を具体的にイメージできるか):
+# - 「選択器」(矢印を回して方向を決めるアプリ)
+# - ルーレット型の抽選ホイールアプリ(景品・くじ引きなど、当選角度を決める)
+# のように、性質の異なる複数のアプリで軽微な設定変更(min/maxTurns)だけで
+# そのまま使える。
+#
+# category: "randomization" は security-sensitive-categories.yaml に
+# 未記載の新規カテゴリのため、デフォルトでsecurity-sensitive扱いとなり
+# forkableはfalseに固定される(外部秘密鍵・認証・決済を扱わない純粋関数
+# ではあるが、安全側の判定に従う。error-handling-conventionのように
+# 後日人間がレビューして変更することは可能)。
+
+id: random-rotation
+node_type: reference
+
+category: randomization
+
+forkable: false
+
+entry: ./index.ts
