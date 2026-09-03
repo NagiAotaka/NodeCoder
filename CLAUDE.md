@@ -32,7 +32,7 @@
 
 ## 現在の作業範囲
 
-**Phase 0 は完了。Phase 1 に着手する。Phase 2 以降の項目には着手しない。**
+**Phase 0・Phase 1 は完了。Phase 2 以降の項目には着手しない。**
 
 Phase 0 で作ったもの(完了済み):
 - `schema.yaml`フォーマット(`node_type` / `forkable` / `category` / `config` / `entry`)
