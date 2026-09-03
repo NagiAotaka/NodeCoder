@@ -40,6 +40,59 @@ description: node-library に新しいノードを追加する(schema.yaml の�
 
 判断が付かない場合のみ、ユーザーに確認する。
 
+## 0.5 実行場所の確認: node-library自身 か content repo か
+
+`/add-node`は2つの文脈で呼ばれうる。**新しいノードの実体ファイル
+(`schema.yaml`・`entry.ts`・`template.*.hbs`・`verify.ts`)をどこに作るか**が
+文脈によって変わるため、最初に確認する。
+
+- **node-library自身のリポジトリ内で実行している**(直下に`nodes/`がある):
+  そのまま`nodes/<id>/`に作る。通常通りコミット・pushする。
+- **content repo内で実行している**(`vendor/node-library/`がある。
+  `install.sh`で導入済みのプロジェクト): **新しいノードの定義ファイルは
+  `vendor/node-library/nodes/<id>/`に作る**(content repo自身の`src/`等では
+  ない)。理由: `vendor/node-library`はnode-libraryリポジトリの完全な
+  gitチェックアウト(submodule)であり、ここに作ったノードはnode-library
+  本体に「共有」できる。手順は次の「共有」節を参照。
+  - 例外: 既存の**生成型**ノードを使ってコードを生成するだけの場合(新しい
+    ノード定義を作るわけではない)は、生成結果は通常通りcontent repo自身の
+    `src/`等に出力する(「手順(scaffold型)」参照)。
+
+## 共有: content repo内で追加した新規ノードをnode-library本体に書き戻す
+
+content repo内で新しいノード(参照型・生成型いずれも)を`vendor/node-library/nodes/<id>/`
+に作った場合、そのままでは**そのcontent repoだけのローカルな変更**で終わる。
+他のプロジェクトでも使えるようにするには、node-library本体(リモート)に
+push する必要がある:
+
+1. `vendor/node-library`はnode-library本体への完全なgitチェックアウトなので、
+   その中で新しいブランチを切る:
+   ```
+   cd vendor/node-library
+   git checkout -b add-<新ノードid>
+   ```
+2. ノードの追加作業(このSkillの通常の手順)を`vendor/node-library/nodes/<id>/`
+   配下で行う。security-sensitiveなノードなら手順7の確認も忘れずに行う。
+3. コミットし、node-library本体のリモートへpushする(content repo自身の
+   pushとは別operationであることに注意):
+   ```
+   git add nodes/<新ノードid>
+   git commit -m "add <新ノードid>"
+   git push origin add-<新ノードid>
+   ```
+4. node-library側でPRを作成し、レビュー後mainにマージする(node-library
+   自身の運用ルールに従う。CLAUDE.md「絶対に守ること」参照)。
+5. マージ後、**このcontent repo自身の`vendor/node-library`参照コミットも
+   更新して、content repo側でコミットする**(そうしないと、このcontent repo
+   は新しいノードを使えるのに、まだ古いコミットを参照したままになる):
+   ```
+   cd vendor/node-library && git checkout main && git pull
+   cd ../..
+   git add vendor/node-library
+   git commit -m "update vendor/node-library"
+   ```
+6. 他のcontent repoに配りたい場合は、通常の一括反映(`update-nodes.sh`)を使う。
+
 ## 手順
 
 ### 1. `node_type` を確認する(最優先・必須)
